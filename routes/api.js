@@ -187,7 +187,7 @@ router.get('/health', async (req, res) => {
   let ttStatus = 'unknown';
   try {
     const auth = { username: process.env.TICKET_TAILOR_API_KEY, password: '' };
-    await axios.get('https://api.tickettailor.com/v1/event_series', { auth, params: { limit: 1 } });
+    await axios.get('https://api.tickettailor.com/v1/orders', { auth, params: { limit: 1 } });
     ttStatus = 'connected';
   } catch (err) {
     ttStatus = 'error';

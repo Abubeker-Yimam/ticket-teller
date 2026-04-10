@@ -140,6 +140,48 @@ router.get('/partners', requireAuth, async (req, res) => {
   res.json(formatted);
 });
 
+// ─── GET /api/tickets ────────────────────────────────────────────────────────
+router.get('/tickets', requireAuth, async (req, res) => {
+  const { role, partner_id } = req.user;
+  const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+
+  try {
+    const auth = { username: process.env.TICKET_TAILOR_API_KEY, password: '' };
+    const response = await axios.get('https://api.tickettailor.com/v1/issued_tickets', { 
+      auth, 
+      params: { limit: 100 } 
+    });
+    
+    let tickets = response.data.data;
+
+    if (role === 'partner') {
+      const { data: events } = await supabaseAdmin
+        .from('referral_events')
+        .select('order_id')
+        .eq('referral_tag', partner_id);
+      
+      const partnerOrderIds = new Set(events?.map(e => e.order_id) || []);
+      tickets = tickets.filter(t => partnerOrderIds.has(t.order_id));
+    }
+
+    const formatted = tickets.slice(0, limit).map(t => ({
+      id: t.id,
+      orderId: t.order_id,
+      attendeeName: t.full_name || 'Anonymous',
+      email: t.email,
+      ticketType: t.description,
+      status: t.status,
+      checkedIn: String(t.checked_in) === 'true',
+      timestamp: new Date(t.created_at * 1000).toISOString()
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    logger.error('Failed to fetch tickets from Ticket Tailor', { error: err.message });
+    res.status(500).json({ error: 'Failed to synchronize with Ticket Tailor' });
+  }
+});
+
 // ─── GET /api/health ─────────────────────────────────────────────────────────
 router.get('/health', async (req, res) => {
   let ttStatus = 'unknown';

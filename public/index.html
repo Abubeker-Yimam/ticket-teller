@@ -66,6 +66,15 @@
         <span>Activity</span>
         <span class="nav-badge" id="badge-activity">0</span>
       </a>
+      <a href="#tickets" class="nav-item" id="nav-tickets" onclick="navigate('tickets')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+          </svg>
+        </span>
+        <span>Tickets</span>
+        <span class="nav-badge" id="badge-tickets">0</span>
+      </a>
       <a href="#system" class="nav-item" id="nav-system" onclick="navigate('system')">
         <span class="nav-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,6 +228,23 @@
           </div>
         </div>
 
+        <!-- Recent Tickets -->
+        <div class="card tickets-card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Attendees</h2>
+            <a href="#tickets" class="card-link" onclick="navigate('tickets')">All tickets →</a>
+          </div>
+          <div class="top-partners-list" id="recent-tickets-list">
+            <div class="feed-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <p>No tickets issued yet</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -288,6 +314,37 @@
             </svg>
             <p>No events recorded yet</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ TICKETS PAGE ══════════════ -->
+    <section class="page" id="page-tickets">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Attendee List</h2>
+          <div class="card-actions">
+            <input class="search-input" id="ticket-search" type="text" placeholder="Search attendees…" oninput="filterTickets()" />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="tickets-table">
+            <thead>
+              <tr>
+                <th>Attendee</th>
+                <th>Order ID</th>
+                <th>Ticket Type</th>
+                <th>Status</th>
+                <th>Check-in</th>
+                <th>Registered</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-tbody">
+              <tr>
+                <td colspan="6" class="table-empty">Loading tickets…</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

@@ -14,8 +14,10 @@ const state = {
   partners: [],
   health: {},
   logs: [],
+  tickets: [], // Attendees from TT
   activityFilter: 'all',
   partnerSearch: '',
+  ticketSearch: '',
   refreshInterval: null,
   lastEventCount: 0,
 };
@@ -25,6 +27,7 @@ const pages = {
   dashboard: { title: 'Dashboard',  subtitle: 'Real-time referral partner overview' },
   partners:  { title: 'Registry',   subtitle: 'Manage your referral partner network' },
   activity:  { title: 'Activity',   subtitle: 'Full webhook event log' },
+  tickets:   { title: 'Attendance', subtitle: 'Live attendee list and check-in status' },
   system:    { title: 'System',     subtitle: 'Health, config, and audit logs' },
 };
 
@@ -82,6 +85,7 @@ async function refreshAll() {
     fetchStats(),
     fetchEvents(),
     fetchPartners(),
+    fetchTickets(),
   ]);
 
   renderCurrentPage();
@@ -110,6 +114,14 @@ async function fetchPartners() {
   }
 }
 
+async function fetchTickets() {
+  const data = await fetchJSON('/api/tickets?limit=50');
+  if (data) {
+    state.tickets = data;
+    updateTicketBadge();
+  }
+}
+
 async function fetchHealth() {
   const data = await fetchJSON('/api/health');
   if (data) state.health = data;
@@ -126,6 +138,7 @@ function renderCurrentPage() {
     case 'dashboard': renderDashboard(); break;
     case 'partners':  renderPartners();  break;
     case 'activity':  renderActivity();  break;
+    case 'tickets':   renderTickets();   break;
     case 'system':    renderSystem();    break;
   }
 }
@@ -135,6 +148,7 @@ function renderDashboard() {
   updateStatCards();
   renderFeed('feed-dashboard', state.events.slice(0, 15));
   renderTopPartners();
+  renderRecentTickets();
 }
 
 function updateStatCards() {
@@ -315,6 +329,77 @@ function renderActivity() {
   renderFeed('feed-activity', filtered);
 }
 
+// ── Render: Tickets ────────────────────────────────────────
+function renderTickets() {
+  const tbody = document.getElementById('tickets-tbody');
+  const query = (state.ticketSearch || '').toLowerCase();
+
+  let filtered = state.tickets;
+  if (query) {
+    filtered = filtered.filter(t =>
+      (t.attendeeName || '').toLowerCase().includes(query) ||
+      (t.email || '').toLowerCase().includes(query) ||
+      (t.orderId || '').toLowerCase().includes(query)
+    );
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="table-empty">${query ? 'No attendees match your search.' : 'No tickets found.'}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(t => `
+    <tr>
+      <td>
+        <div class="partner-cell">
+          <div class="partner-cell-avatar" style="background:var(--blue-glow);color:var(--blue)">${initials(t.attendeeName)}</div>
+          <div>
+            <div class="partner-cell-name">${esc(t.attendeeName)} ${t.checkedIn ? '<span title="Checked In">✅</span>' : ''}</div>
+            <div class="partner-cell-email">${esc(t.email)}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="mono">${esc(t.orderId)}</span></td>
+      <td><span class="text-subtle">${esc(t.ticketType)}</span></td>
+      <td><span class="badge-status ${t.status === 'valid' ? 'badge-active' : 'badge-inactive'}">${esc(t.status)}</span></td>
+      <td>
+        <span class="status-indicator ${t.checkedIn ? 'ok' : ''}">
+          ${t.checkedIn ? 'Scanned' : 'Pending'}
+        </span>
+      </td>
+      <td class="text-subtle" style="font-size:11px">${timeAgo(t.timestamp)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderRecentTickets() {
+  const container = document.getElementById('recent-tickets-list');
+  if (!container) return;
+
+  const tickets = state.tickets.slice(0, 5);
+
+  if (tickets.length === 0) {
+    container.innerHTML = `
+      <div class="feed-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <p>No tickets issued yet</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = tickets.map(t => `
+    <div class="top-partner-item">
+      <div class="partner-avatar" style="background:var(--blue-glow);color:var(--blue)">${initials(t.attendeeName)}</div>
+      <div class="partner-info">
+        <div class="partner-name">${esc(t.attendeeName)}</div>
+        <div class="partner-sales">${esc(t.ticketType)} · #${esc(t.orderId)}</div>
+      </div>
+      <div class="status-indicator ${t.checkedIn ? 'ok' : ''}" title="${t.checkedIn ? 'Checked In' : 'Pending'}">
+        ${t.checkedIn ? '✓' : ''}
+      </div>
+    </div>`).join('');
+}
+
 // ── Render: System ─────────────────────────────────────────
 async function renderSystem() {
   await Promise.all([fetchHealth(), fetchLogs()]);
@@ -346,6 +431,12 @@ async function renderSystem() {
       value: h.adminEmailSet ? 'Admin email set' : 'Not configured',
       ok: h.adminEmailSet,
       icon: '🔔',
+    },
+    {
+      label: 'Ticket Tailor API',
+      value: h.ticketTailor === 'connected' ? 'Connected' : 'Connection Error',
+      ok: h.ticketTailor === 'connected',
+      icon: '🎫',
     },
     {
       label: 'Node.js Version',
@@ -424,6 +515,11 @@ function setActivityFilter(type, btn) {
   renderActivity();
 }
 
+function filterTickets() {
+  state.ticketSearch = document.getElementById('ticket-search').value;
+  renderTickets();
+}
+
 async function invalidateCache() {
   try {
     const res = await fetch('/api/cache/invalidate', { method: 'POST' });
@@ -456,6 +552,11 @@ function updateActivityBadge() {
 function updatePartnerBadge() {
   const el = document.getElementById('badge-partners');
   if (el) el.textContent = state.partners.length;
+}
+
+function updateTicketBadge() {
+  const el = document.getElementById('badge-tickets');
+  if (el) el.textContent = state.tickets.length;
 }
 
 // ── Utilities ──────────────────────────────────────────────
@@ -511,6 +612,7 @@ function startAutoRefresh() {
     await fetchStats();
     await fetchEvents();
     await fetchPartners();
+    await fetchTickets();
     renderCurrentPage();
     updateLastUpdated();
   }, 10000); // every 10 seconds

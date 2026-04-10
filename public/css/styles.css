@@ -337,7 +337,7 @@ body {
 /* ══════════════ DASHBOARD BOTTOM ═══════════════════════════ */
 .dashboard-bottom {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1.5fr 1fr 1fr;
   gap: 16px;
 }
 
@@ -619,6 +619,25 @@ body {
 .health-status.ok   { color: var(--green); }
 .health-status.warn { color: var(--gold); }
 .health-status.bad  { color: var(--red); }
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.status-indicator.ok { color: var(--green); }
+.status-indicator.ok::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+}
+
+.text-subtle { color: var(--text-secondary); opacity: 0.8; }
 
 .log-viewer {
   padding: 16px 22px;

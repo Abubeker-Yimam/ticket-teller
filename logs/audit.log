@@ -1,0 +1,10 @@
+[2026-04-10 09:54:25.283] [INFO ] Referral notifier started {"port":3000,"env":"development","registryMode":"sheets"}
+[2026-04-10 10:02:40.630] [INFO ] Referral notifier started {"port":3000,"env":"development","registryMode":"sheets","dashboard":"http://localhost:3000"}
+[2026-04-10 10:08:36.056] [INFO ] Webhook signature verified ✓
+[2026-04-10 10:08:36.060] [INFO ] Webhook received {"event":"order.placed","orderId":"ord_TEST_1775804915878","referralTag":"PARTNER_001"}
+[2026-04-10 10:08:36.061] [INFO ] Processing partner referral sale {"orderId":"ord_TEST_1775804915878","referralTag":"PARTNER_001"}
+[2026-04-10 10:08:36.063] [INFO ] Partner registry: fetching from Google Sheets
+[2026-04-10 10:08:36.099] [ERROR] Partner registry lookup failed, falling back to JSON {"referralTag":"PARTNER_001","error":"ENOENT: no such file or directory, open 'C:\\Users\\Abuki\\Downloads\\Esmael\\project_esm\\service-account.json'"}
+[2026-04-10 10:08:38.579] [ERROR] SendGrid failed to send sale notification {"to":"kwame@example.com","orderId":"ord_TEST_1775804915878","error":"[{\"message\":\"The provided authorization grant is invalid, expired, or revoked\",\"field\":null,\"help\":null}]"}
+[2026-04-10 10:08:38.581] [ERROR] Unhandled error in event handler {"event":"order.placed","orderId":"ord_TEST_1775804915878","error":"Unauthorized","stack":"Error: Unauthorized\n    at C:\\Users\\Abuki\\Downloads\\Esmael\\project_esm\\node_modules\\@sendgrid\\client\\src\\classes\\client.js:167:29\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)"}
+[2026-04-10 10:11:46.610] [INFO ] Referral notifier started {"port":3000,"env":"development","registryMode":"sheets","dashboard":"http://localhost:3000"}

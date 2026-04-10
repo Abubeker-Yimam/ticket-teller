@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Referral Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: inline-block;
+      filter: drop-shadow(0 0 12px rgba(82, 183, 136, 0.3));
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all var(--transition);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--green);
+      background: var(--surface-3);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-top: 10px;
+    }
+
+    .btn-login:hover {
+      background: #40a070;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(82, 183, 136, 0.3);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #error-msg {
+      background: var(--red-glow);
+      color: var(--red);
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">🎟️</div>
+      <h1 class="login-title">Referral Hub</h1>
+      <p class="login-subtitle">Sign in to your account</p>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="name@example.com" required
+          autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="••••••••" required
+          autocomplete="current-password" />
+      </div>
+      <button type="submit" id="submit-btn" class="btn-login">Sign In</button>
+    </form>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    // Configuration Injection (Temporary workaround for SPA without build step)
+    // In a real production setup, these would be injected by Netlify Build
+    // or fetched via a config endpoint.
+    window.SUPABASE_URL = "https://ozcbgffmlznsfcsuytdk.supabase.co";
+    window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96Y2JnZmZtbHpuc2Zjc3V5dGRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzI3NzIsImV4cCI6MjA5MTM0ODc3Mn0.pRiO7g1mMc_6_07rREbLGByKcuqTgu8VwoonZ3_eGhA";
+
+    const form = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        await auth.login(email, password);
+        window.location.href = '/';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+      }
+    });
+
+    // If already logged in, redirect to dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Need to wait for SUPABASE keys to be replaced or set
+      if (window.SUPABASE_URL.startsWith('REPLACE')) {
+        errorMsg.textContent = "System Configuration Required: Please set Supabase URL and Anon Key in login.html";
+        errorMsg.style.display = 'block';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      const session = await auth.getSession();
+      if (session) window.location.href = '/';
+    });
+  </script>
+</body>
+
+</html>

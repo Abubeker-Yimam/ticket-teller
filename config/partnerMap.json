@@ -1,0 +1,32 @@
+{
+  "PARTNER_001": {
+    "name": "esmael seid",
+    "email": "esmael228@gmail.com",
+    "commission_rate": 0.10,
+    "active": true
+  },
+  "PARTNER_002": {
+    "name": "Ama Events",
+    "email": "ama@example.com",
+    "commission_rate": 0.12,
+    "active": true
+  },
+  "PARTNER_003": {
+    "name": "Kofi Media",
+    "email": "kofi@example.com",
+    "commission_rate": 0.08,
+    "active": true
+  },
+  "PARTNER_004": {
+    "name": "Sara Ads",
+    "email": "sara@example.com",
+    "commission_rate": 0.10,
+    "active": true
+  },
+  "PARTNER_005": {
+    "name": "abubeker yimam",
+    "email": "aboker.y@gmail.com",
+    "commission_rate": 0.10,
+    "active": true
+  }
+}

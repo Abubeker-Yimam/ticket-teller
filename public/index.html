@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Admin dashboard for the Sunbol Onsa referral partner notification system." />
+  <title>Referral Hub — Sunbol Onsa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Configuration Injection
+    window.SUPABASE_URL = "https://ozcbgffmlznsfcsuytdk.supabase.co";
+    window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96Y2JnZmZtbHpuc2Zjc3V5dGRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzI3NzIsImV4cCI6MjA5MTM0ODc3Mn0.pRiO7g1mMc_6_07rREbLGByKcuqTgu8VwoonZ3_eGhA";
+  </script>
+</head>
+
+<body>
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🎟️</div>
+      <div class="logo-text">
+        <span class="logo-title">Referral Hub</span>
+        <span class="logo-sub">Sunbol Onsa</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#partners" class="nav-item" id="nav-partners" onclick="navigate('partners')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </span>
+        <span>Partners</span>
+        <span class="nav-badge" id="badge-partners">0</span>
+      </a>
+      <a href="#activity" class="nav-item" id="nav-activity" onclick="navigate('activity')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </span>
+        <span>Activity</span>
+        <span class="nav-badge" id="badge-activity">0</span>
+      </a>
+      <a href="#system" class="nav-item" id="nav-system" onclick="navigate('system')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+          </svg>
+        </span>
+        <span>System</span>
+        <span class="status-dot" id="system-status-dot"></span>
+      </a>
+      <div style="margin-top: auto; padding-top: 20px;">
+        <a href="#" class="nav-item" onclick="auth.logout()">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </span>
+          <span>Sign Out</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="live-indicator">
+        <span class="pulse-dot"></span>
+        <span id="live-label">Live</span>
+      </div>
+      <span class="last-updated" id="last-updated-label">Waiting...</span>
+    </div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <main class="main" id="main">
+
+    <!-- ── Top Bar ── -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+        <span class="page-subtitle" id="page-subtitle">Real-time referral partner overview</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-icon" onclick="refreshAll()" title="Refresh data" id="refresh-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+          </svg>
+        </button>
+        <div class="uptime-badge" id="uptime-badge">⏱ 0s uptime</div>
+      </div>
+    </header>
+
+    <!-- ══════════════ DASHBOARD PAGE ══════════════ -->
+    <section class="page active" id="page-dashboard">
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" id="card-sales">
+          <div class="stat-icon green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="stat-sales">0</div>
+            <div class="stat-label">Total Sales</div>
+          </div>
+          <div class="stat-trend" id="trend-sales"></div>
+        </div>
+
+        <div class="stat-card" id="card-commission">
+          <div class="stat-icon gold">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="stat-commission">GHS 0.00</div>
+            <div class="stat-label">Total Commission Paid</div>
+          </div>
+        </div>
+
+        <div class="stat-card" id="card-tickets">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="stat-tickets">0</div>
+            <div class="stat-label">Tickets Sold</div>
+          </div>
+        </div>
+
+        <div class="stat-card" id="card-cancellations">
+          <div class="stat-icon red">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="stat-cancellations">0</div>
+            <div class="stat-label">Cancellations</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Activity Feed + Top Partners -->
+      <div class="dashboard-bottom">
+
+        <!-- Live Feed -->
+        <div class="card feed-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span class="pulse-dot small"></span>
+              Live Activity
+            </h2>
+            <span class="card-hint">Auto-refreshes every 10s</span>
+          </div>
+          <div class="feed" id="feed-dashboard">
+            <div class="feed-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <p>Waiting for webhook events…</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Partners -->
+        <div class="card top-partners-card">
+          <div class="card-header">
+            <h2 class="card-title">Top Partners</h2>
+            <a href="#partners" class="card-link" onclick="navigate('partners')">View all →</a>
+          </div>
+          <div class="top-partners-list" id="top-partners-list">
+            <div class="feed-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+              <p>No sales recorded yet</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════ PARTNERS PAGE ══════════════ -->
+    <section class="page" id="page-partners">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">All Partners</h2>
+          <div class="card-actions">
+            <input class="search-input" id="partner-search" type="text" placeholder="Search partners…"
+              oninput="filterPartners()" />
+            <button class="btn btn-secondary" onclick="invalidateCache()" title="Force registry refresh">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              Refresh Registry
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="partners-table">
+            <thead>
+              <tr>
+                <th>Partner</th>
+                <th>Referral ID</th>
+                <th>Commission</th>
+                <th>Sales</th>
+                <th>Tickets</th>
+                <th>Earned</th>
+                <th>Last Sale</th>
+                <th>Status</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="partners-tbody">
+              <tr>
+                <td colspan="9" class="table-empty">Loading partners…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ ACTIVITY PAGE ══════════════ -->
+    <section class="page" id="page-activity">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Activity Log</h2>
+          <div class="card-actions">
+            <div class="filter-tabs" id="activity-filters">
+              <button class="filter-tab active" data-type="all" onclick="setActivityFilter('all', this)">All</button>
+              <button class="filter-tab" data-type="sale" onclick="setActivityFilter('sale', this)">Sales</button>
+              <button class="filter-tab" data-type="cancellation"
+                onclick="setActivityFilter('cancellation', this)">Cancellations</button>
+              <button class="filter-tab" data-type="unknown_tag"
+                onclick="setActivityFilter('unknown_tag', this)">Unknown</button>
+            </div>
+          </div>
+        </div>
+        <div class="feed feed-full" id="feed-activity">
+          <div class="feed-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <p>No events recorded yet</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ SYSTEM PAGE ══════════════ -->
+    <section class="page" id="page-system">
+      <div class="system-grid">
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">System Health</h2>
+          </div>
+          <div class="health-list" id="health-list">
+            <div class="feed-empty">
+              <p>Loading health status…</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Configuration</h2>
+          </div>
+          <div class="config-list" id="config-list">
+            <div class="feed-empty">
+              <p>Loading config…</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card log-card">
+          <div class="card-header">
+            <h2 class="card-title">Audit Log</h2>
+            <span class="card-hint">Last 50 entries</span>
+          </div>
+          <div class="log-viewer" id="log-viewer">
+            <code>Loading logs…</code>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

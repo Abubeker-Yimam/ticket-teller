@@ -1,0 +1,23 @@
+[build]
+  publish = "public"
+  functions = "functions"
+
+# ─── Redirects ───
+
+# Redirect /api connections to the Netlify Function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Redirect /webhook connections for Ticket Tailor
+[[redirects]]
+  from = "/webhook"
+  to = "/.netlify/functions/api/webhook"
+  status = 200
+
+# SPA fallback: Route all other non-file requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

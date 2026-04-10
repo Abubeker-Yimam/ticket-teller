@@ -2,6 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const { supabaseAdmin } = require('../services/supabaseClient');
 const { formatAmount } = require('../utils/formatCurrency');
 const logger = require('../utils/logger');

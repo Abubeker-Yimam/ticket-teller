@@ -7,7 +7,7 @@ require('dotenv').config();
 const SECRET = process.env.TICKET_TAILOR_WEBHOOK_SECRET || 'test_secret';
 const URL = 'http://localhost:3000/webhook';
 
-async function sendTest(event = 'order.placed', referralTag = 'PARTNER_001') {
+async function sendTest(event = 'order.created', referralTag = 'commodity-thursdays') {
   console.log(`\n🚀 Sending test webhook to ${URL}`);
   console.log(`   Event:         ${event}`);
   console.log(`   Referral Tag:  ${referralTag}`);
@@ -19,7 +19,7 @@ async function sendTest(event = 'order.placed', referralTag = 'PARTNER_001') {
     data: {
       id: orderId,
       total: 15000,
-      currency: 'GHS',
+      currency: 'CHF',
       referral_tag: referralTag,
       occurred_at: new Date().toISOString(),
       event_details: { name: 'Sunbolon Summer Festival' },
@@ -47,7 +47,7 @@ async function sendTest(event = 'order.placed', referralTag = 'PARTNER_001') {
   }
 }
 
-const event = process.argv[2] || 'order.placed';
-const tag = process.argv[3] || 'PARTNER_001';
+const event = process.argv[2] || 'order.created';
+const tag = process.argv[3] || 'commodity-thursdays';
 
 sendTest(event, tag);

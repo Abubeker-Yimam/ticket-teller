@@ -8,10 +8,12 @@
  * @param {string} currency - ISO 4217 currency code e.g. "GHS", "USD", "GBP"
  * @returns {string}        - e.g. "GHS 75.00"
  */
-function formatAmount(amount, currency = 'GHS') {
+function formatAmount(amount, currency = 'CHF') {
   if (typeof amount !== 'number' || isNaN(amount)) return `${currency} 0.00`;
-  const value = (amount / 100).toFixed(2);
-  return `${currency} ${value}`;
+  return new Intl.NumberFormat('de-CH', {
+    style: 'currency',
+    currency: currency,
+  }).format(amount / 100);
 }
 
 /**

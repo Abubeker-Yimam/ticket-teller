@@ -50,9 +50,11 @@ app.post(
     logger.info('Webhook received', { event, orderId: data?.id });
 
     try {
-      if (event === 'order.placed') {
-        await handleOrderPlaced(data);
+      if (event === 'order.created' || event === 'order.updated') {
+        const { handleOrderEvent } = require('./handlers/orderPlaced');
+        await handleOrderEvent(event, data);
       } else if (event === 'order.cancelled') {
+        const { handleOrderCancelled } = require('./handlers/orderCancelled');
         await handleOrderCancelled(data);
       }
     } catch (handlerErr) {

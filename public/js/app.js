@@ -23,7 +23,7 @@ const state = {
 // ── Page metadata ─────────────────────────────────────────
 const pages = {
   dashboard: { title: 'Dashboard',  subtitle: 'Real-time referral partner overview' },
-  partners:  { title: 'Partners',   subtitle: 'Manage your referral partner network' },
+  partners:  { title: 'Registry',   subtitle: 'Manage your referral partner network' },
   activity:  { title: 'Activity',   subtitle: 'Full webhook event log' },
   system:    { title: 'System',     subtitle: 'Health, config, and audit logs' },
 };
@@ -140,7 +140,7 @@ function renderDashboard() {
 function updateStatCards() {
   const s = state.stats;
   setStatValue('stat-sales',         s.totalSales        ?? 0);
-  setStatValue('stat-commission',    s.totalCommission   ?? 'GHS 0.00');
+  setStatValue('stat-commission',    s.totalCommission   ?? 'CHF 0.00');
   setStatValue('stat-tickets',       s.totalTickets      ?? 0);
   setStatValue('stat-cancellations', s.totalCancellations ?? 0);
 
@@ -171,6 +171,11 @@ function renderTopPartners() {
     .filter(p => p.totalSales > 0)
     .sort((a, b) => b.totalSales - a.totalSales)
     .slice(0, 6);
+
+  if (state.user.role !== 'admin') {
+    container.closest('.card').style.display = 'none';
+    return;
+  }
 
   if (top.length === 0) {
     container.innerHTML = `
@@ -567,12 +572,21 @@ async function init() {
 
 function applyRoleUI() {
   const isAdmin = state.user.role === 'admin';
+  const isPartner = state.user.role === 'partner';
   
   // Sidebar visibility
   const pNav = document.getElementById('nav-partners');
   const sNav = document.getElementById('nav-system');
   if (pNav) pNav.style.display = isAdmin ? '' : 'none';
   if (sNav) sNav.style.display = isAdmin ? '' : 'none';
+
+  // Display Referral ID for Partners
+  if (isPartner && state.user.partner_id) {
+    const subtitle = document.getElementById('page-subtitle');
+    if (subtitle) {
+      subtitle.innerHTML = `Connected as <code>${esc(state.user.partner_id)}</code> · Real-time earnings in CHF`;
+    }
+  }
 }
 
 async function promptPasswordChange() {

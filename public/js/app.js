@@ -344,7 +344,7 @@ function renderTickets() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="table-empty">${query ? 'No attendees match your search.' : 'No tickets found.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="table-empty">${query ? 'No attendees match your search.' : 'No tickets found.'}</td></tr>`;
     return;
   }
 
@@ -361,6 +361,7 @@ function renderTickets() {
       </td>
       <td><span class="mono">${esc(t.orderId)}</span></td>
       <td><span class="text-subtle">${esc(t.ticketType)}</span></td>
+      <td><span class="badge-status ${t.referralTag === 'direct' ? 'badge-inactive' : 'badge-active'}" style="font-size:10px">${esc(t.referralTag)}</span></td>
       <td><span class="badge-status ${t.status === 'valid' ? 'badge-active' : 'badge-inactive'}">${esc(t.status)}</span></td>
       <td>
         <span class="status-indicator ${t.checkedIn ? 'ok' : ''}">

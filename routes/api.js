@@ -155,13 +155,22 @@ router.get('/tickets', requireAuth, async (req, res) => {
     
     let tickets = response.data.data;
 
+    const { data: events } = await supabaseAdmin
+      .from('referral_events')
+      .select('order_id, referral_tag');
+    
+    // Create a quick lookup for order -> tag
+    const orderTagMap = events?.reduce((acc, e) => {
+      acc[e.order_id] = e.referral_tag;
+      return acc;
+    }, {}) || {};
+
     if (role === 'partner') {
-      const { data: events } = await supabaseAdmin
-        .from('referral_events')
-        .select('order_id')
-        .eq('referral_tag', partner_id);
-      
-      const partnerOrderIds = new Set(events?.map(e => e.order_id) || []);
+      const partnerOrderIds = new Set(
+        events
+          ?.filter(e => e.referral_tag === partner_id)
+          .map(e => e.order_id) || []
+      );
       tickets = tickets.filter(t => partnerOrderIds.has(t.order_id));
     }
 
@@ -173,7 +182,8 @@ router.get('/tickets', requireAuth, async (req, res) => {
       ticketType: t.description,
       status: t.status,
       checkedIn: String(t.checked_in) === 'true',
-      timestamp: new Date(t.created_at * 1000).toISOString()
+      timestamp: new Date(t.created_at * 1000).toISOString(),
+      referralTag: orderTagMap[t.order_id] || 'direct'
     }));
 
     res.json(formatted);

@@ -67,8 +67,8 @@ router.get('/stats', requireAuth, async (req, res) => {
 
   res.json({
     ...stats,
-    totalCommission: formatAmount(stats.totalCommission, 'GHS'),
-    uptime: Math.floor(process.uptime()), // Uptime is still relevant for health
+    totalCommission: formatAmount(stats.totalCommission, 'CHF'),
+    uptime: Math.floor(process.uptime()),
   });
 });
 
@@ -79,7 +79,12 @@ router.get('/events', requireAuth, async (req, res) => {
 
   let query = supabaseAdmin
     .from('referral_events')
-    .select('*')
+    .select(`
+      *,
+      profiles:referral_tag (
+        name
+      )
+    `)
     .order('occurred_at', { ascending: false })
     .limit(limit);
 
@@ -90,7 +95,21 @@ router.get('/events', requireAuth, async (req, res) => {
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
 
-  res.json(data);
+  // Map database fields to what the frontend expects
+  const formatted = data.map(evt => ({
+    id: evt.id,
+    type: evt.event_type,
+    orderId: evt.order_id,
+    referralTag: evt.referral_tag,
+    partnerName: evt.profiles?.name || 'Partner',
+    eventName: evt.event_name,
+    ticketQuantity: evt.ticket_count,
+    orderTotal: formatAmount(evt.order_total_raw, evt.currency),
+    commission: formatAmount(evt.commission_raw, evt.currency),
+    timestamp: evt.occurred_at
+  }));
+
+  res.json(formatted);
 });
 
 // ─── GET /api/partners ────────────────────────────────────────────────────────

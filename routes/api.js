@@ -142,9 +142,19 @@ router.get('/partners', requireAuth, async (req, res) => {
 
 // ─── GET /api/health ─────────────────────────────────────────────────────────
 router.get('/health', async (req, res) => {
-  // Public health check (minimal)
+  let ttStatus = 'unknown';
+  try {
+    const auth = { username: process.env.TICKET_TAILOR_API_KEY, password: '' };
+    await axios.get('https://api.tickettailor.com/v1/event_series', { auth, params: { limit: 1 } });
+    ttStatus = 'connected';
+  } catch (err) {
+    ttStatus = 'error';
+    logger.error('Health check: Ticket Tailor API unreachable', { error: err.message });
+  }
+
   res.json({
     status: 'ok',
+    ticketTailor: ttStatus,
     registryMode: 'supabase',
     deployTarget: 'netlify',
     ts: new Date().toISOString()

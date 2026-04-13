@@ -8,7 +8,7 @@ const { requireAuth } = require('./api'); // Reuse auth middleware
 const { sendInvitationEmail } = require('../services/emailService');
 const logger = require('../utils/logger');
 
-// ─── ADMIN ENDPOINTS ─────────────────────────────────────────────────────────
+// ─── ADMIN ENDPOINTS ─aaa────────────────────────────────────────────────────────
 
 // GET /api/invitations - List all invitations
 router.get('/', requireAuth, async (req, res) => {

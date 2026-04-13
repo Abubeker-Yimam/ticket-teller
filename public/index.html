@@ -14,6 +14,10 @@
   <link rel="stylesheet" href="/css/styles.css" />
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS for XLSX export -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- kjua for QR codes -->
+  <script src="https://cdn.jsdelivr.net/npm/kjua@0.9.0/dist/kjua.min.js"></script>
   <script>
     // Configuration Injection
     window.SUPABASE_URL = "https://ozcbgffmlznsfcsuytdk.supabase.co";
@@ -26,75 +30,197 @@
   <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">🎟️</div>
+      <div class="logo-icon"><img src="/logo.png" alt="Logo" style="width: 38px; height: 38px; border-radius: 50%; display: block;"></div>
       <div class="logo-text">
-        <span class="logo-title">Referral Hub</span>
-        <span class="logo-sub">Sunbolon SA</span>
+        <span class="logo-title" id="sidebar-logo-title">Referral Hub</span>
+        <span class="logo-sub" id="sidebar-logo-sub">Sunbolon SA</span>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <a href="#dashboard" class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </svg>
-        </span>
-        <span>Dashboard</span>
-      </a>
-      <a href="#partners" class="nav-item" id="nav-partners" onclick="navigate('partners')">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-        </span>
-        <span>Partners</span>
-        <span class="nav-badge" id="badge-partners">0</span>
-      </a>
-      <a href="#activity" class="nav-item" id="nav-activity" onclick="navigate('activity')">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-          </svg>
-        </span>
-        <span>Activity</span>
-        <span class="nav-badge" id="badge-activity">0</span>
-      </a>
-      <a href="#tickets" class="nav-item" id="nav-tickets" onclick="navigate('tickets')">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-          </svg>
-        </span>
-        <span>Tickets</span>
-        <span class="nav-badge" id="badge-tickets">0</span>
-      </a>
-      <a href="#system" class="nav-item" id="nav-system" onclick="navigate('system')">
-        <span class="nav-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
-          </svg>
-        </span>
-        <span>System</span>
-        <span class="status-dot" id="system-status-dot"></span>
-      </a>
+      <!-- MY HUB Group -->
+      <div class="nav-group" id="nav-group-hub">
+        <div class="nav-group-header" onclick="toggleNavGroup('hub')">
+          <span class="nav-group-title">MY HUB</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="nav-group-content" id="nav-content-hub">
+          <a href="#dashboard" class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+            </span>
+            <span>My Dashboard</span>
+          </a>
+          <a href="#profile" class="nav-item" id="nav-profile" onclick="navigate('profile')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <span>My Profile</span>
+          </a>
+          <a href="#orders" class="nav-item" id="nav-orders" onclick="navigate('orders')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+                <line x1="8" y1="15" x2="10" y2="15" />
+                <line x1="14" y1="15" x2="16" y2="15" />
+              </svg>
+            </span>
+            <span>Orders & Sales</span>
+            <span class="nav-badge" id="badge-orders" style="display:none;">0</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- COMMERCE AND EVENTS Group -->
+      <div class="nav-group" id="nav-group-commerce">
+        <div class="nav-group-header" onclick="toggleNavGroup('commerce')">
+          <span class="nav-group-title">EVENTS & CRM</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="nav-group-content" id="nav-content-commerce">
+          <a href="#tickets" class="nav-item" id="nav-tickets" onclick="navigate('tickets')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+              </svg>
+            </span>
+            <span>Tickets</span>
+            <span class="nav-badge" id="badge-tickets" style="display:none;">0</span>
+          </a>
+          <a href="#partners" class="nav-item admin-only" id="nav-partners" onclick="navigate('partners')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            <span>Partners</span>
+            <span class="nav-badge" id="badge-partners" style="display:none;">0</span>
+          </a>
+          <a href="#payouts" class="nav-item admin-only" id="nav-payouts" onclick="navigate('payouts')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </span>
+            <span>Payouts</span>
+            <span class="nav-badge" id="badge-payouts" style="display:none;">0</span>
+          </a>
+          <!-- Partner-only Earnings nav -->
+          <a href="#earnings" class="nav-item partner-only" id="nav-earnings" onclick="navigate('earnings')" style="display:none;">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </span>
+            <span>My Earnings</span>
+          </a>
+          <a href="#payout-settings" class="nav-item partner-only" id="nav-payout-settings" onclick="navigate('payout-settings')" style="display:none;">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+                <line x1="8" y1="15" x2="10" y2="15"/>
+                <line x1="14" y1="15" x2="16" y2="15"/>
+              </svg>
+            </span>
+            <span>Payout Settings</span>
+          </a>
+          <a href="#reports" class="nav-item admin-only" id="nav-reports" onclick="navigate('reports')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </span>
+            <span>Reports</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- COMMUNICATION Group -->
+      <div class="nav-group" id="nav-group-communication">
+        <div class="nav-group-header" onclick="toggleNavGroup('communication')">
+          <span class="nav-group-title">COMMUNITY</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="nav-group-content" id="nav-content-communication">
+          <a href="#chat" class="nav-item" id="nav-chat" onclick="navigate('chat')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </span>
+            <span>Messages<span class="nav-unread-dot" id="chat-unread-dot" style="display:none;"></span></span>
+            <span class="nav-badge" id="badge-chat" style="display:none;">0</span>
+          </a>
+          <a href="#activity" class="nav-item" id="nav-activity" onclick="navigate('activity')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </span>
+            <span>Activity Log</span>
+            <span class="nav-badge" id="badge-activity" style="display:none;">0</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SYSTEM Group -->
+      <div class="nav-group admin-only" id="nav-group-system">
+        <div class="nav-group-header" onclick="toggleNavGroup('system')">
+          <span class="nav-group-title">ACCOUNT</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="nav-group-content" id="nav-content-system">
+          <a href="#system" class="nav-item" id="nav-system" onclick="navigate('system')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+              </svg>
+            </span>
+            <span>System Health</span>
+            <span class="status-dot" id="system-status-dot"></span>
+          </a>
+        </div>
+      </div>
+      
       <div style="margin-top: auto; padding-top: 20px;">
-        <a href="#" class="nav-item" onclick="auth.logout()">
-          <span class="nav-icon">
+        <a href="#" class="nav-item" onclick="toggleTheme(event)">
+          <span class="nav-icon" id="theme-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>
             </svg>
           </span>
-          <span>Sign Out</span>
+          <span id="theme-text">Theme</span>
+        </a>
+        <a href="#" class="nav-item text-red" onclick="auth.logout()" id="sidebar-logout" style="color: var(--red);">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </span>
+          <span>Logout</span>
         </a>
       </div>
     </nav>
@@ -105,6 +231,10 @@
         <span id="live-label">Live</span>
       </div>
       <span class="last-updated" id="last-updated-label">Waiting...</span>
+      <div class="sidebar-copyright">
+        <span>&copy; <span id="copyright-year"></span> SunBolon SA</span>
+        <span>All rights reserved</span>
+      </div>
     </div>
   </aside>
 
@@ -113,19 +243,73 @@
 
     <!-- ── Top Bar ── -->
     <header class="topbar">
-      <div class="topbar-left">
-        <h1 class="page-title" id="page-title">Dashboard</h1>
-        <span class="page-subtitle" id="page-subtitle">Real-time referral partner overview</span>
-      </div>
-      <div class="topbar-right">
-        <button class="btn-icon" onclick="refreshAll()" title="Refresh data" id="refresh-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="23 4 23 10 17 10" />
-            <polyline points="1 20 1 14 7 14" />
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      <div class="topbar-left" style="display:flex; align-items:center; gap: 16px; flex: 1;">
+        <button class="btn-icon mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <div class="uptime-badge" id="uptime-badge">⏱ 0s uptime</div>
+        <div class="global-search-container" style="position: relative; max-width: 400px; width: 100%;">
+          <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="global-search" class="form-input" oninput="performGlobalSearch(event)" placeholder="Search services, people, events..." style="padding-left: 36px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border);" />
+        </div>
+        <!-- Hidden title elements for JS access -->
+        <h1 class="page-title" id="page-title" style="display:none;">Dashboard</h1>
+        <span class="page-subtitle" id="page-subtitle" style="display:none;">Real-time referral partner overview</span>
+      </div>
+      
+      <div class="topbar-right" style="display:flex; align-items:center; gap: 16px;">
+        <select id="global-partner-filter" class="form-select admin-only" onchange="applyGlobalFilter()" style="display:none; max-width: 200px; background: var(--surface-2); border-radius: 99px; border: 1px solid var(--border);">
+           <option value="">All Partners</option>
+        </select>
+        <div class="notification-wrapper" style="position: relative;">
+          <button class="btn-icon" id="notification-btn" title="Notifications" onclick="toggleNotificationPanel(event)" style="border-radius: 50%;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge" id="top-notification-badge" style="display:none;">0</span>
+          </button>
+          
+          <!-- Dropdown Panel -->
+          <div class="notification-panel" id="notification-panel" style="display:none;">
+            <div class="notification-header">
+              <h3 style="margin:0; font-size:14px;">Notifications</h3>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-text" onclick="markAllNotificationsRead()">Mark all read</button>
+              </div>
+            </div>
+            <div class="notification-body" id="notification-list">
+               <div class="feed-empty" style="padding: 24px;">No new notifications</div>
+            </div>
+            <div class="notification-footer">
+               <a href="#" onclick="navigate('activity'); toggleNotificationPanel(event);">View All</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-menu-wrapper" style="position: relative;">
+          <button class="user-menu-btn" onclick="toggleUserDropdown(event)" style="background: var(--gold); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: none; cursor: pointer; text-transform: uppercase;">
+             <span id="user-avatar-initial">E</span>
+          </button>
+          
+          <div class="user-dropdown-panel" id="user-dropdown-panel" style="display:none;">
+             <div style="padding: 12px 16px; border-bottom: 1px solid var(--border);">
+               <div style="font-size: 14px; font-weight: 600;" id="dropdown-user-name">User Name</div>
+               <div style="font-size: 12px; color: var(--text-muted);" id="dropdown-user-role">Role</div>
+             </div>
+             <a href="#" class="dropdown-item" onclick="navigate('profile'); toggleUserDropdown(event);">My Profile</a>
+             <a href="#" class="dropdown-item" onclick="openPasswordModal(); toggleUserDropdown(event);">Change Password</a>
+             <a href="#" class="dropdown-item" onclick="toggleMutePreference();" id="sound-toggle-btn">
+               <span id="sound-status-text">Sound: ON</span>
+             </a>
+             <div style="border-top: 1px solid var(--border);">
+               <a href="#" class="dropdown-item text-red" onclick="auth.logout()" style="color: var(--red);">Logout</a>
+             </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -148,6 +332,19 @@
           <div class="stat-trend" id="trend-sales"></div>
         </div>
 
+        <div class="stat-card" id="card-revenue" style="display: none;">
+          <div class="stat-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="stat-revenue">CHF 0.00</div>
+            <div class="stat-label">Total Revenue</div>
+          </div>
+        </div>
+
         <div class="stat-card" id="card-commission">
           <div class="stat-icon gold">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -156,8 +353,8 @@
             </svg>
           </div>
           <div class="stat-body">
-            <div class="stat-value" id="stat-commission">GHS 0.00</div>
-            <div class="stat-label">Total Commission Paid</div>
+            <div class="stat-value" id="stat-commission">CHF 0.00</div>
+            <div class="stat-label" id="label-commission">Total Commission Paid</div>
           </div>
         </div>
 
@@ -189,6 +386,58 @@
         </div>
       </div>
 
+      <!-- Partner Toolkit (Visible to Partners Only) -->
+      <div class="card" id="partner-toolkit-card" style="margin-top: 24px; display: none;">
+        <div class="card-header">
+          <h2 class="card-title">🚀 Your Growth Toolkit</h2>
+          <span class="card-hint">Generate tracking links and QR codes</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; padding: 10px;">
+          <!-- Link Builder -->
+          <div>
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="filter-label">Base Referral Link</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="tk-base-link" class="form-input mono" readonly style="background:var(--surface); font-size:13px;" />
+                <button class="btn btn-secondary btn-sm" onclick="copyToolkitLink()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+              <div class="form-group">
+                <label class="filter-label">Traffic Source (UTM Source)</label>
+                <input type="text" id="tk-utm-source" class="form-input" placeholder="e.g. facebook, email, blog" oninput="updateToolkitLink()" />
+              </div>
+              <div class="form-group">
+                <label class="filter-label">Campaign Name (UTM Campaign)</label>
+                <input type="text" id="tk-utm-campaign" class="form-input" placeholder="e.g. spring_promo" oninput="updateToolkitLink()" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="filter-label">Final Trackable Link</label>
+              <div class="pii-notice-banner" style="margin:0; padding:12px; font-family:var(--font-mono); font-size:12px; word-break:break-all; border:1px solid var(--border);" id="tk-final-link">
+                ...
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Preview -->
+          <div style="background:var(--surface); border-radius:12px; padding:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid var(--border);">
+            <div id="tk-qr-container" style="background:#fff; padding:12px; border-radius:8px; margin-bottom:16px;">
+              <!-- QR Code Canvas Injected Here -->
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="downloadToolkitQR()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download QR
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Bottom Row: Activity Feed + Top Partners -->
       <div class="dashboard-bottom">
 
@@ -198,8 +447,9 @@
             <h2 class="card-title">
               <span class="pulse-dot small"></span>
               Live Activity
+              <span class="page-count-badge" id="dashboard-activity-count">0</span>
             </h2>
-            <span class="card-hint">Auto-refreshes every 10s</span>
+            <a href="#activity" class="card-link" onclick="navigate('activity')">View all →</a>
           </div>
           <div class="feed" id="feed-dashboard">
             <div class="feed-empty">
@@ -212,9 +462,9 @@
         </div>
 
         <!-- Top Partners -->
-        <div class="card top-partners-card">
+        <div class="card top-partners-card admin-only">
           <div class="card-header">
-            <h2 class="card-title">Top Partners</h2>
+            <h2 class="card-title">Top Partners <span class="page-count-badge" id="dashboard-partners-count">0</span></h2>
             <a href="#partners" class="card-link" onclick="navigate('partners')">View all →</a>
           </div>
           <div class="top-partners-list" id="top-partners-list">
@@ -231,7 +481,7 @@
         <!-- Recent Tickets -->
         <div class="card tickets-card">
           <div class="card-header">
-            <h2 class="card-title">Recent Attendees</h2>
+            <h2 class="card-title">Recent Attendees <span class="page-count-badge" id="dashboard-tickets-count">0</span></h2>
             <a href="#tickets" class="card-link" onclick="navigate('tickets')">All tickets →</a>
           </div>
           <div class="top-partners-list" id="recent-tickets-list">
@@ -256,6 +506,7 @@
           <div class="card-actions">
             <input class="search-input" id="partner-search" type="text" placeholder="Search partners…"
               oninput="filterPartners()" />
+            <button class="btn btn-primary" onclick="openInvitationModal()" id="btn-add-partner" style="display:none; margin-right: 12px;">+ Invite Partner</button>
             <button class="btn btn-secondary" onclick="invalidateCache()" title="Force registry refresh">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="23 4 23 10 17 10" />
@@ -270,20 +521,49 @@
           <table class="data-table" id="partners-table">
             <thead>
               <tr>
-                <th>Partner</th>
-                <th>Referral ID</th>
-                <th>Commission</th>
-                <th>Sales</th>
-                <th>Tickets</th>
-                <th>Earned</th>
-                <th>Last Sale</th>
-                <th>Status</th>
-                <th>Link</th>
+                <th class="sortable" data-sort-col="name" data-sort-page="partners">Partner</th>
+                <th class="sortable" data-sort-col="id" data-sort-page="partners">Referral ID</th>
+                <th class="sortable" data-sort-col="commissionRate" data-sort-page="partners">Commission</th>
+                <th class="sortable sort-desc" data-sort-col="totalSales" data-sort-page="partners">Sales</th>
+                <th class="sortable" data-sort-col="totalTickets" data-sort-page="partners">Tickets</th>
+                <th class="sortable" data-sort-col="totalCommissionRaw" data-sort-page="partners">Earned</th>
+                <th class="sortable" data-sort-col="lastSale" data-sort-page="partners">Last Sale</th>
+                <th class="sortable" data-sort-col="status" data-sort-page="partners">Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="partners-tbody">
               <tr>
                 <td colspan="9" class="table-empty">Loading partners…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pending Invitations -->
+      <div class="card" style="margin-top: 30px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Pending Invitations</h2>
+            <p class="card-hint">Manage sent invites and resend or revoke them.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Commission</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invitations-tbody">
+              <tr>
+                <td colspan="6" class="table-empty">Loading invitations…</td>
               </tr>
             </tbody>
           </table>
@@ -297,6 +577,7 @@
         <div class="card-header">
           <h2 class="card-title">Activity Log</h2>
           <div class="card-actions">
+            <input class="search-input" id="activity-search" type="text" placeholder="Search events…" oninput="filterActivity()" style="margin-right:12px;" />
             <div class="filter-tabs" id="activity-filters">
               <button class="filter-tab active" data-type="all" onclick="setActivityFilter('all', this)">All</button>
               <button class="filter-tab" data-type="sale" onclick="setActivityFilter('sale', this)">Sales</button>
@@ -331,13 +612,13 @@
           <table class="data-table" id="tickets-table">
             <thead>
               <tr>
-                <th>Attendee</th>
-                <th>Order ID</th>
-                <th>Ticket Type</th>
-                <th>Channel</th>
-                <th>Status</th>
-                <th>Check-in</th>
-                <th>Registered</th>
+                <th class="sortable" data-sort-col="attendeeName" data-sort-page="tickets">Attendee</th>
+                <th class="sortable" data-sort-col="orderId" data-sort-page="tickets">Order ID</th>
+                <th class="sortable" data-sort-col="ticketType" data-sort-page="tickets">Ticket Type</th>
+                <th class="sortable" data-sort-col="referralTag" data-sort-page="tickets">Channel</th>
+                <th class="sortable" data-sort-col="status" data-sort-page="tickets">Status</th>
+                <th class="sortable" data-sort-col="checkedIn" data-sort-page="tickets">Check-in</th>
+                <th class="sortable sort-desc" data-sort-col="timestamp" data-sort-page="tickets">Registered</th>
               </tr>
             </thead>
             <tbody id="tickets-tbody">
@@ -350,6 +631,228 @@
       </div>
     </section>
 
+    <!-- ══════════════ REPORTS PAGE ══════════════ -->
+    <section class="page" id="page-reports">
+      <!-- Presets bar -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h2 class="card-title">Saved Presets</h2>
+            <div id="preset-chips" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="preset-name-input" class="form-input" placeholder="Preset name…" style="width:160px; padding:6px 10px; font-size:13px;" />
+            <button class="btn btn-secondary" onclick="savePreset()">Save Preset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div class="report-filter-bar">
+            <!-- Report Type -->
+            <div class="filter-group">
+              <label class="filter-label">Report Type</label>
+              <select id="report-type" class="form-select" onchange="renderReport()">
+                <option value="partner">By Partner</option>
+                <option value="event">By Event</option>
+                <option value="order">By Order</option>
+                <option value="attribution">By Attribution Source</option>
+                <option value="commission">By Commission Status</option>
+                <option value="payout">By Payout Period</option>
+                <option value="rankings">Rankings</option>
+              </select>
+            </div>
+            <!-- Partner Filter -->
+            <div class="filter-group">
+              <label class="filter-label">Partner</label>
+              <select id="report-partner" class="form-select" onchange="renderReport()">
+                <option value="">All Partners</option>
+              </select>
+            </div>
+            <!-- Date From -->
+            <div class="filter-group">
+              <label class="filter-label">From</label>
+              <input type="date" id="report-date-from" class="form-input" style="padding:6px 10px; font-size:13px;" onchange="renderReport()" />
+            </div>
+            <!-- Date To -->
+            <div class="filter-group">
+              <label class="filter-label">To</label>
+              <input type="date" id="report-date-to" class="form-input" style="padding:6px 10px; font-size:13px;" onchange="renderReport()" />
+            </div>
+            <!-- Period Group -->
+            <div class="filter-group">
+              <label class="filter-label">Period Group</label>
+              <select id="report-period" class="form-select" onchange="renderReport()">
+                <option value="week">Weekly</option>
+                <option value="month" selected>Monthly</option>
+                <option value="quarter">Quarterly</option>
+              </select>
+            </div>
+            <!-- Commission Status -->
+            <div class="filter-group">
+              <label class="filter-label">Comm. Status</label>
+              <select id="report-comm-status" class="form-select" onchange="renderReport()">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+              </select>
+            </div>
+            <!-- Rankings Sort -->
+            <div class="filter-group" id="rank-sort-group">
+              <label class="filter-label">Rank By</label>
+              <select id="report-rank-by" class="form-select" onchange="renderReport()">
+                <option value="totalSales">Sales Count</option>
+                <option value="totalTickets">Tickets Sold</option>
+                <option value="totalRevenue">Revenue</option>
+                <option value="totalCommission">Commission</option>
+              </select>
+            </div>
+          </div>
+          <!-- Export Buttons -->
+          <div style="display:flex; gap:8px; align-items:flex-end;">
+            <button class="btn btn-secondary btn-sm" onclick="refreshReports()" title="Reload report data">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+            <button class="btn btn-secondary" onclick="exportCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV
+            </button>
+            <button class="btn btn-primary" onclick="exportXLSX()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              XLSX
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div id="report-summary-cards" class="stats-grid" style="margin-bottom: 16px;"></div>
+
+      <!-- Report Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title" id="report-table-title">Report</h2>
+          <span class="card-hint" id="report-row-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="report-table">
+            <thead id="report-thead"></thead>
+            <tbody id="report-tbody"><tr><td class="table-empty">Select a report type above</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ ORDERS PAGE ══════════════ -->
+    <section class="page" id="page-orders">
+
+      <!-- Filter Bar -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h2 class="card-title">Order Search</h2>
+            <!-- Status Tabs -->
+            <div class="filter-tabs" id="orders-filter-tabs">
+              <button class="filter-tab active" data-status="all"     onclick="setOrderStatusFilter('all', this)">All</button>
+              <button class="filter-tab"        data-status="confirmed" onclick="setOrderStatusFilter('confirmed', this)">Confirmed</button>
+              <button class="filter-tab"        data-status="cancelled" onclick="setOrderStatusFilter('cancelled', this)">Cancelled</button>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <input class="search-input" id="orders-search" type="text" placeholder="Search order ref, event…" oninput="filterOrders()" style="min-width:210px;"/>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <label style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">From</label>
+              <input type="date" id="orders-date-from" class="form-input" style="padding:5px 8px; font-size:12px;" onchange="applyOrderDateFilter()" />
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <label style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">To</label>
+              <input type="date" id="orders-date-to" class="form-input" style="padding:5px 8px; font-size:12px;" onchange="applyOrderDateFilter()" />
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="forceRefreshOrders()" title="Refresh orders">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PII Notice Banner -->
+      <div class="pii-notice-banner" id="pii-notice-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span id="pii-notice-text">Order references are masked to protect customer privacy. Contact your administrator to enable restricted PII access.</span>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Attributed Orders</h2>
+          <span class="card-hint" id="orders-row-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="orders-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort-col="order_id" data-sort-page="orders">Order Ref</th>
+                <th class="sortable sort-desc" data-sort-col="purchase_date" data-sort-page="orders">Date</th>
+                <th class="sortable" data-sort-col="event_name" data-sort-page="orders">Event</th>
+                <th class="sortable" data-sort-col="tickets_count" data-sort-page="orders" style="text-align:center;">Qty</th>
+                <th class="sortable" data-sort-col="amount_gross" data-sort-page="orders">Gross</th>
+                <th class="sortable" data-sort-col="amount_discount" data-sort-page="orders">Discount</th>
+                <th class="sortable" data-sort-col="commission_amount" data-sort-page="orders">Commission</th>
+                <th class="sortable" data-sort-col="status" data-sort-page="orders">Status</th>
+                <th>PII</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="9" class="table-empty">Loading orders…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Admin-only: PII Access Audit Log -->
+      <div class="card" id="pii-log-card" style="margin-top:16px; display:none;">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; opacity:.7">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            PII Access Log
+          </h2>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="card-hint">Immutable — last 100 entries</span>
+            <button class="btn btn-secondary btn-sm" onclick="fetchPiiLogs()" title="Refresh audit log">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="pii-log-table">
+            <thead>
+              <tr>
+                <th>Accessed At</th>
+                <th>Accessor ID</th>
+                <th>Role</th>
+                <th>Partner</th>
+                <th>Order ID</th>
+                <th>Fields Revealed</th>
+              </tr>
+            </thead>
+            <tbody id="pii-log-tbody">
+              <tr><td colspan="6" class="table-empty">No PII access events recorded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
     <!-- ══════════════ SYSTEM PAGE ══════════════ -->
     <section class="page" id="page-system">
       <div class="system-grid">
@@ -357,6 +860,7 @@
         <div class="card">
           <div class="card-header">
             <h2 class="card-title">System Health</h2>
+            <button class="btn btn-secondary btn-sm" onclick="testResendEmail()">Send Test Email</button>
           </div>
           <div class="health-list" id="health-list">
             <div class="feed-empty">
@@ -378,7 +882,17 @@
 
         <div class="card log-card">
           <div class="card-header">
-            <h2 class="card-title">Audit Log</h2>
+            <h2 class="card-title">Security Activity</h2>
+            <span class="card-hint">Last 100 entries</span>
+          </div>
+          <div class="log-viewer" id="security-log-viewer">
+            <code>Loading security logs…</code>
+          </div>
+        </div>
+
+        <div class="card log-card">
+          <div class="card-header">
+            <h2 class="card-title">PII Audit Log</h2>
             <span class="card-hint">Last 50 entries</span>
           </div>
           <div class="log-viewer" id="log-viewer">
@@ -389,12 +903,731 @@
       </div>
     </section>
 
+    <!-- ══════════════ PROFILE PAGE ══════════════ -->
+    <section class="page" id="page-profile">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+         <div class="card-header">
+           <h2 class="card-title">My Profile</h2>
+           <div style="display:flex; gap:8px;">
+             <button class="btn btn-secondary" onclick="enableProfileEdit()" id="btn-edit-profile">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                Edit Profile
+             </button>
+             <div id="btn-profile-actions" style="display:none; gap: 8px;">
+               <button class="btn btn-secondary" onclick="cancelProfileEdit()">Cancel</button>
+               <button class="btn btn-primary" onclick="saveProfileChanges()">Save Changes</button>
+             </div>
+             <button class="btn-icon" onclick="navigate('dashboard')" title="Close Profile">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+             </button>
+           </div>
+         </div>
+         <div style="padding: 24px;">
+           <form id="profile-form">
+              <!-- Avatar / Name Section -->
+              <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
+                 <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: var(--green);">
+                   <span id="profile-avatar-initial">?</span>
+                 </div>
+                 <div style="flex: 1;">
+                    <div class="form-group" style="max-width: 300px;">
+                      <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Full Name</label>
+                      <input type="text" id="prof-name" class="form-input disabled-input" disabled />
+                    </div>
+                 </div>
+              </div>
+
+              <!-- Locked Fields -->
+              <div style="margin-bottom: 24px; padding: 16px; background: rgba(0,0,0,0.05); border-radius: 8px; border: 1px dashed var(--border);">
+                 <h4 style="font-size: 12px; text-transform: uppercase; margin-bottom: 12px; color: var(--text-muted);">Account Identifiers (Read-Only)</h4>
+                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                      <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Email</label>
+                      <input type="email" id="prof-email" class="form-input mono" disabled style="opacity: 0.7;" />
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Referral Tag</label>
+                      <input type="text" id="prof-tag" class="form-input mono" disabled style="opacity: 0.7;" />
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                      <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">User ID</label>
+                      <input type="text" id="prof-id" class="form-input mono" disabled style="opacity: 0.7;" />
+                    </div>
+                 </div>
+              </div>
+
+              <!-- Editable Fields -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                 <div class="form-group">
+                   <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Phone Number</label>
+                   <input type="tel" id="prof-phone" class="form-input disabled-input" disabled placeholder="+1 234 567 8900" />
+                 </div>
+                 <div class="form-group">
+                   <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Company / Organization</label>
+                   <input type="text" id="prof-company" class="form-input disabled-input" disabled placeholder="e.g. Acme Corp" />
+                 </div>
+                 <div class="form-group" style="grid-column: span 2;">
+                   <label style="display:block; margin-bottom:4px; font-size:12px; color:var(--text-secondary);">Address</label>
+                   <input type="text" id="prof-address" class="form-input disabled-input" disabled placeholder="Full address..." />
+                 </div>
+              </div>
+
+           </form>
+         </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ ADMIN PAYOUTS PAGE ══════════════ -->
+    <section class="page" id="page-payouts">
+      <!-- Summary Metrics -->
+      <div class="balance-cards-grid" id="payouts-summary-metrics" style="margin-bottom:24px"></div>
+
+      <div class="card">
+        <!-- Tabs -->
+        <div class="payout-page-tabs">
+          <button class="payout-page-tab active" data-tab="overview">Overview</button>
+          <button class="payout-page-tab" data-tab="transactions">Transactions</button>
+          <button class="payout-page-tab" data-tab="audit">Audit Log</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="payout-filter-bar">
+          <div class="filter-group">
+            <label class="filter-label">Partner</label>
+            <select id="payouts-filter-partner" class="form-select" onchange="applyPayoutsFilter()" style="min-width:180px">
+              <option value="">All Partners</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Status Filter</label>
+            <select id="payouts-filter-status" class="form-select" onchange="applyPayoutsFilter()">
+              <option value="">All</option>
+              <option value="has-balance">Has Available Balance</option>
+              <option value="no-method">Missing Payment Method</option>
+              <option value="needs-attention">Needs Attention</option>
+            </select>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-self:flex-end">
+            <button class="btn btn-secondary" onclick="refreshPayoutsPage()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+            <button class="btn btn-secondary" onclick="exportPayoutsCSV()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="payout-tab-content active" id="payout-tab-overview">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Partner</th>
+                  <th>Referral ID</th>
+                  <th>Total Earned</th>
+                  <th>Pending</th>
+                  <th>Available</th>
+                  <th>Paid</th>
+                  <th>Payment Method</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payouts-table-body">
+                <tr><td colspan="9" class="table-empty">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div class="payout-tab-content" id="payout-tab-transactions">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Partner</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Reference</th>
+                  <th>Payout Date</th>
+                  <th>Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-body">
+                <tr><td colspan="8" class="table-empty">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Audit Log Tab -->
+        <div class="payout-tab-content" id="payout-tab-audit">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date/Time</th>
+                  <th>Partner</th>
+                  <th>Actor</th>
+                  <th>Event</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="audit-log-table-body">
+                <tr><td colspan="5" class="table-empty">Select Audit Log tab to load.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ PARTNER EARNINGS PAGE ══════════════ -->
+    <section class="page" id="page-earnings">
+      <!-- Warning banners -->
+      <div id="earnings-warnings"></div>
+
+      <!-- Balance Cards -->
+      <div class="balance-cards-grid" id="earnings-balance-cards">
+        <div style="color:var(--text-muted);padding:20px">Loading balances…</div>
+      </div>
+
+      <!-- Payment Method on File -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h2 class="card-title">💳 Payment Method</h2>
+          <button class="btn btn-secondary btn-sm" onclick="navigate('payout-settings')">Manage Payment Settings</button>
+        </div>
+        <div style="padding:16px 22px" id="earnings-pm-section"></div>
+      </div>
+
+      <!-- Payout History -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">📋 Payout History</h2>
+          <span class="card-hint">Your received payments</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table payout-history-table">
+            <thead>
+              <tr>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Reference</th>
+                <th>Date</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="earnings-history-tbody">
+              <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ PARTNER PAYOUT SETTINGS PAGE ══════════════ -->
+    <section class="page" id="page-payout-settings">
+      <div class="card" style="max-width:780px;margin:0 auto">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">💳 Payout Settings</h2>
+            <p class="card-hint">Add or update the payment details we'll use to send your earnings.</p>
+          </div>
+        </div>
+
+        <!-- Current method display -->
+        <div style="padding:20px 22px 0" id="current-payment-method-display"></div>
+
+        <!-- Payment Form -->
+        <div class="payment-method-section">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text-secondary)">Add / Update Payment Method</h3>
+
+          <form id="payout-settings-form" onsubmit="event.preventDefault(); savePaymentMethod();">
+            <!-- Method Type Tabs -->
+            <div class="payment-method-tabs">
+              <button type="button" class="method-tab" data-method="bank_transfer">
+                <span class="method-icon">🏦</span> Bank Transfer
+              </button>
+              <button type="button" class="method-tab" data-method="paypal">
+                <span class="method-icon">💙</span> PayPal
+              </button>
+              <button type="button" class="method-tab" data-method="mobile_money">
+                <span class="method-icon">📱</span> Mobile Money
+              </button>
+              <button type="button" class="method-tab" data-method="other">
+                <span class="method-icon">💳</span> Other
+              </button>
+            </div>
+
+            <!-- Bank Transfer Fields -->
+            <div class="method-fields" id="fields-bank_transfer">
+              <div class="method-fields-grid">
+                <div class="form-group">
+                  <label class="filter-label">Account Holder Name *</label>
+                  <input type="text" id="pm-account-holder" class="form-input" placeholder="Full legal name" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">Bank Name</label>
+                  <input type="text" id="pm-bank-name" class="form-input" placeholder="e.g. UBS, Credit Suisse" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">IBAN / Account Number *</label>
+                  <input type="text" id="pm-account-iban" class="form-input" placeholder="CH56 0483 5012 3456 7800 9" style="font-family:'JetBrains Mono',monospace" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">SWIFT / BIC</label>
+                  <input type="text" id="pm-swift-bic" class="form-input" placeholder="e.g. UBSWCHZH80A" style="font-family:'JetBrains Mono',monospace" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">Country</label>
+                  <input type="text" id="pm-country" class="form-input" placeholder="Country of bank account" />
+                </div>
+              </div>
+            </div>
+
+            <!-- PayPal Fields -->
+            <div class="method-fields" id="fields-paypal">
+              <div class="method-fields-grid">
+                <div class="form-group">
+                  <label class="filter-label">Account Holder Name *</label>
+                  <input type="text" id="pm-account-holder" class="form-input" placeholder="Full name on PayPal" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">PayPal Email *</label>
+                  <input type="email" id="pm-paypal-email" class="form-input" placeholder="your@paypal.email" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">Country</label>
+                  <input type="text" id="pm-country" class="form-input" placeholder="Country" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Money Fields -->
+            <div class="method-fields" id="fields-mobile_money">
+              <div class="method-fields-grid">
+                <div class="form-group">
+                  <label class="filter-label">Account Holder Name *</label>
+                  <input type="text" id="pm-account-holder" class="form-input" placeholder="Registered name" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">Mobile Number *</label>
+                  <input type="tel" id="pm-mobile-number" class="form-input" placeholder="+233 XX XXX XXXX" style="font-family:'JetBrains Mono',monospace" />
+                </div>
+                <div class="form-group">
+                  <label class="filter-label">Country</label>
+                  <input type="text" id="pm-country" class="form-input" placeholder="Country" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Other Fields -->
+            <div class="method-fields" id="fields-other">
+              <div class="method-fields-grid">
+                <div class="form-group full-width">
+                  <label class="filter-label">Payment Notes *</label>
+                  <textarea id="pm-payment-notes" class="form-input" rows="3" placeholder="Describe your preferred payment method, account details, and any other instructions…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Common notes field (for all methods) -->
+            <div class="form-group" style="margin-top:16px" id="common-notes-field">
+              <label class="filter-label">Additional Notes (Optional)</label>
+              <input type="text" id="pm-payment-notes" class="form-input" placeholder="Any additional payment instructions" />
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+              <button type="button" class="btn btn-secondary" onclick="navigate('earnings')">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="btn-save-payment-method">💾 Save Payment Details</button>
+            </div>
+          </form>
+
+          <div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.03);border-radius:var(--radius);border:1px dashed var(--border)">
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.7">
+              🔒 <strong>Security Notice:</strong> Your payment information is stored securely and only visible to you and the administrator for processing payouts. It will never be shared with third parties.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Toast notification -->
   <div class="toast" id="toast"></div>
 
+  <!-- ── PII Scripts & State managed via JS ── -->
+
+  <!-- Modals -->
+  <div id="partner-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <h3 id="modal-partner-title" style="margin-bottom: 20px;">Invite New Partner</h3>
+      <div id="partner-modal-error" style="color:var(--red); margin-bottom:10px; display:none; font-size:14px;"></div>
+      <form id="partner-form">
+        <input type="hidden" id="partner_id_edit" />
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Name</label>
+            <input type="text" id="partner_name" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Email</label>
+            <input type="email" id="partner_email" class="form-input" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Referral ID (Tag)</label>
+            <input type="text" id="partner_tag" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Commission Rate (e.g. 10%)</label>
+            <input type="text" id="partner_commission" class="form-input" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Discount Code (Optional)</label>
+            <input type="text" id="partner_discount" class="form-input" placeholder="e.g. SAVE10" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Company Name</label>
+            <input type="text" id="partner_company" class="form-input" />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Phone Number</label>
+            <input type="text" id="partner_phone" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Country</label>
+            <input type="text" id="partner_country" class="form-input" />
+          </div>
+        </div>
+
+
+        <div style="display:flex; justify-content:flex-end; gap: 12px; margin-top:24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('partner-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-partner">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══ PAYOUT TRANSACTION MODAL (Admin) ══ -->
+  <div id="payout-transaction-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:500px">
+      <h3 style="margin-bottom:4px">Create Payout Transaction</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Send a payout to <strong id="ptt-partner-name"></strong></p>
+      <div id="ptt-error" style="color:var(--red);background:var(--red-glow);padding:10px;border-radius:8px;margin-bottom:14px;font-size:13px;display:none;"></div>
+      <div class="payout-modal-amount">
+        <div class="pma-label">Available Balance</div>
+        <div class="pma-value" id="ptt-available">CHF 0.00</div>
+      </div>
+      <input type="hidden" id="ptt-partner-id" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="filter-label" style="margin-bottom:6px;display:block">Payout Amount (CHF) *</label>
+          <input type="number" id="ptt-amount" class="form-input" min="0.01" step="0.01" placeholder="0.00" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px" />
+        </div>
+        <div class="form-group">
+          <label class="filter-label" style="margin-bottom:6px;display:block">Payout Date</label>
+          <input type="date" id="ptt-date" class="form-input" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="filter-label" style="margin-bottom:6px;display:block">Payment Reference (optional)</label>
+          <input type="text" id="ptt-reference" class="form-input" placeholder="Bank ref, transaction ID…" style="font-family:'JetBrains Mono',monospace" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="filter-label" style="margin-bottom:6px;display:block">Admin Note (optional)</label>
+          <input type="text" id="ptt-note" class="form-input" placeholder="Internal notes…" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+        <button class="btn btn-secondary" onclick="closeModal('payout-transaction-modal')">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-payout-tx" onclick="savePayoutTransaction()">💸 Create Payout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MARK PAID MODAL (Admin) ══ -->
+  <div id="mark-paid-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:420px">
+      <h3 style="margin-bottom:6px">✅ Mark Payout as Paid</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Amount: <strong id="mpm-amount">CHF 0.00</strong></p>
+      <div id="mpm-error" style="color:var(--red);background:var(--red-glow);padding:10px;border-radius:8px;margin-bottom:14px;font-size:13px;display:none;"></div>
+      <input type="hidden" id="mpm-tx-id" />
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="filter-label" style="margin-bottom:6px;display:block">Payment Reference *</label>
+        <input type="text" id="mpm-reference" class="form-input" placeholder="Bank ref, transaction ID, receipt number…" style="font-family:'JetBrains Mono',monospace" />
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="filter-label" style="margin-bottom:6px;display:block">Payment Date</label>
+        <input type="date" id="mpm-date" class="form-input" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+        <button class="btn btn-secondary" onclick="closeModal('mark-paid-modal')">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-paid" onclick="confirmMarkPaid()">✅ Confirm Paid</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAYMENT INFO MODAL (Admin views partner payment details) ══ -->
+  <div id="payment-info-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:560px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h3 style="margin:0">💳 Partner Payment Details</h3>
+        <button class="btn-icon" onclick="closeModal('payment-info-modal')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div id="payment-info-modal-body"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:20px">
+        <button class="btn btn-secondary" onclick="closeModal('payment-info-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PII Reveal Modal — shows revealed order details after API confirmation -->
+  <div id="pii-reveal-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:520px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+        <span style="font-size:22px;">🔓</span>
+        <h3 style="margin:0;">Revealed Order Details</h3>
+      </div>
+      <div id="pii-modal-warning" style="background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); border-radius:8px; padding:10px 14px; font-size:12px; color:#fbbf24; margin-bottom:18px;"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Order Reference</div>
+          <div id="pii-modal-order-id" class="mono" style="font-size:14px; color:var(--green);"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Purchase Date</div>
+          <div id="pii-modal-date" style="font-size:13px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Event</div>
+          <div id="pii-modal-event" style="font-size:13px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Ticket Qty</div>
+          <div id="pii-modal-qty" style="font-size:13px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Gross Amount</div>
+          <div id="pii-modal-gross" class="mono" style="font-size:13px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Discount</div>
+          <div id="pii-modal-discount" class="mono" style="font-size:13px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Commission</div>
+          <div id="pii-modal-commission" class="mono green-text" style="font-size:14px; font-weight:600;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.05em;">Status</div>
+          <div id="pii-modal-status" style="font-size:13px;"></div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="closeModal('pii-reveal-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="password-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 20px;">Change Password</h3>
+      <div id="password-modal-error" style="color:var(--red); margin-bottom:10px; display:none; font-size:14px; background:var(--red-glow); padding:10px; border-radius:8px;"></div>
+      <form id="password-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Current Password</label>
+          <div style="position: relative;">
+            <input type="password" id="current_password" class="form-input" required />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('current_password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer;">Show</button>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">New Password</label>
+          <div style="position: relative;">
+            <input type="password" id="new_password" class="form-input" required oninput="checkPasswordStrength()" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('new_password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer;">Show</button>
+          </div>
+          <!-- Strength Meter -->
+          <div style="margin-top: 8px;">
+            <div style="display: flex; gap: 4px; height: 4px; margin-bottom: 8px;">
+              <div id="str-1" style="flex:1; background:var(--surface-3); border-radius:2px;"></div>
+              <div id="str-2" style="flex:1; background:var(--surface-3); border-radius:2px;"></div>
+              <div id="str-3" style="flex:1; background:var(--surface-3); border-radius:2px;"></div>
+              <div id="str-4" style="flex:1; background:var(--surface-3); border-radius:2px;"></div>
+            </div>
+            <div id="str-label" style="font-size: 11px; color: var(--text-muted); text-align: right; font-weight: 600;">Strength</div>
+            
+            <!-- Requirements List -->
+            <ul style="list-style: none; margin-top: 8px; font-size: 11px; color: var(--text-muted); padding: 0; display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+              <li id="req-len" style="display:flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> 8+ characters</li>
+              <li id="req-upper" style="display:flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> Uppercase</li>
+              <li id="req-lower" style="display:flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> Lowercase</li>
+              <li id="req-num" style="display:flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> Number</li>
+              <li id="req-spec" style="display:flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> Special char</li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Confirm New Password</label>
+          <div style="position: relative;">
+            <input type="password" id="confirm_password" class="form-input" required oninput="checkPasswordMatch()" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('confirm_password', this)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer;">Show</button>
+          </div>
+          <div id="match-error" style="color:var(--red); font-size:11px; margin-top:4px; display:none;">Passwords do not match</div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap: 12px; margin-top:24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('password-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-password" disabled>Change Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width: 400px; padding: 32px;">
+      <div id="confirm-icon-area" style="text-align: center; margin-bottom: 20px; font-size: 32px;"></div>
+      <h3 id="confirm-title" style="margin-bottom: 12px; text-align: center;">Confirmation</h3>
+      <p id="confirm-message" style="margin-bottom: 32px; text-align: center; color: var(--text-secondary); font-size: 14px; line-height: 1.6;"></p>
+      
+      <div style="display:flex; justify-content:center; gap: 12px;">
+        <button type="button" id="confirm-cancel-btn" class="btn btn-secondary" style="flex:1">Cancel</button>
+        <button type="button" id="confirm-proceed-btn" class="btn btn-primary" style="flex:1">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ FLOATING CHAT SYSTEM ══════════════════════════════════ -->
+  <div id="floating-chat-container" style="position: fixed; bottom: 0; right: 24px; z-index: 9999; display: flex; align-items: flex-end; gap: 12px; pointer-events: none;">
+
+    <!-- Dynamically Spawns Individual Chat Windows -->
+    <div id="chat-windows-area" style="display: flex; align-items: flex-end; gap: 12px; pointer-events: auto;">
+      <!-- chat.js injects .chat-widget-expanded windows here -->
+    </div>
+
+    <!-- The Main Controller (Messages List / Docking Bar) -->
+    <div id="floating-chat-widget" class="chat-widget-minimized" style="pointer-events: auto;">
+      <!-- Minimized Bar -->
+      <div class="chat-minimized-bar" id="chat-minimized-bar" onclick="toggleChatExpanded()">
+        <div class="chat-min-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span style="font-weight: 600;">Messages</span>
+          <span id="chat-floating-badge" class="chat-floating-badge" style="display: none;">0</span>
+        </div>
+        <div class="chat-min-right">
+          <button class="chat-min-btn" id="chat-mute-btn" onclick="toggleChatMute(event)" title="Mute Sounds" aria-label="Mute Sounds">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+          <button class="chat-min-btn" title="Expand">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Expanded UI (Conversation List & Partner Search) -->
+      <div class="chat-expanded-panel" id="chat-expanded-panel" style="display: none;">
+        <!-- Conversation List -->
+        <div id="chat-conv-list-container" style="display: flex; height: 100%; flex-direction: column;">
+          <div class="chat-panel-hdr bg-purple">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span style="font-weight: 600;">Conversations</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <!-- + Start New Chat (Admin Only) -->
+              <button class="chat-hdr-btn" id="chat-start-new-btn" onclick="toggleAdminPartnerSearch(event)" title="New Chat" style="display:none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+              <button class="chat-hdr-btn" onclick="minimizeChat(event)" title="Minimize">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="chat-admin-tools" id="chat-admin-tools" style="display: flex;">
+            <input class="search-input" id="chat-search-input" type="text"
+                   placeholder="Search messages…"
+                   oninput="searchConversations()"
+                   style="width:100%; font-size:12px; padding:6px 10px;" />
+          </div>
+          <div id="chat-conv-list" class="chat-conv-list">
+            <!-- Populated by chat.js -->
+          </div>
+        </div>
+
+        <!-- NEW: Admin Partner Search list to initiate new chats -->
+        <div id="chat-partner-search-container" style="display: none; height: 100%; flex-direction: column;">
+          <div class="chat-panel-hdr bg-purple">
+            <div style="display: flex; align-items: center; gap: 8px;">
+               <button class="chat-hdr-btn" onclick="toggleAdminPartnerSearch(event)" title="Back">
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+               </button>
+              <span style="font-weight: 600;">Select Partner</span>
+            </div>
+            <button class="chat-hdr-btn" onclick="minimizeChat(event)" title="Minimize">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
+          <div class="chat-admin-tools" style="display: flex;">
+            <input class="search-input" id="chat-partner-search-input" type="text"
+                   placeholder="Search partners…"
+                   oninput="searchPartnerDirectory()"
+                   style="width:100%; font-size:12px; padding:6px 10px;" />
+          </div>
+          <div id="chat-partner-directory-list" class="chat-conv-list">
+            <!-- Populated by chat.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="sys-notification-sound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3d1efdf771.mp3?filename=notification-11231.mp3" preload="auto"></audio>
+  <audio id="chat-ping-sound" src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_820c7857ec.mp3?filename=positive-notification-102008.mp3" preload="auto"></audio>
+
+
   <script src="/js/auth.js"></script>
+  <script src="/js/reports.js"></script>
+  <script src="/js/orders.js"></script>
+  <script src="/js/chat.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/payouts.js"></script>
   <script src="/js/app.js"></script>
 </body>
 

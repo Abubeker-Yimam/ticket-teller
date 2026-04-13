@@ -1,0 +1,1 @@
+function logState() { console.log(state.hi); }

@@ -1,0 +1,12 @@
+I've analyzed the issue and created an implementation plan. Based on my research, here are the key findings and next steps:
+
+### Findings:
+1.  **Missing Webhook Events**: The system is currently ignoring `order.placed` events from Ticket Tailor, which results in many sales being labeled as "direct" because they aren't recorded in the database.
+2.  **Tracking Link Logic**: "Box-Office Tracking Links" should work with the existing `referral_tag` logic, but adding support for the `order.placed` event will ensure these sales are captured.
+3.  **Data Robustness**: I will improve the data extraction to include more event details, making the admin and partner dashboards more accurate.
+
+### Next Steps:
+I have shared the [Implementation Plan](file:///home/esmael/.gemini/antigravity/brain/3eaf58fc-bfdd-40cd-8f3f-f3d80df23b56/implementation_plan.md) with you. Please review it and let me know if you have any feedback or if you're ready for me to proceed with the fixes.
+
+**One quick question:**
+Do you have an example Order ID that is currently showing as "direct" on your dashboard that I can use for verification? (e.g., something starting with `or_`)

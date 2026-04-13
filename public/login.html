@@ -34,10 +34,15 @@
     }
 
     .login-logo {
-      font-size: 48px;
       margin-bottom: 16px;
       display: inline-block;
       filter: drop-shadow(0 0 12px rgba(82, 183, 136, 0.3));
+    }
+
+    .login-logo-img {
+      width: 64px;
+      height: auto;
+      border-radius: 50%;
     }
 
     .login-title {
@@ -125,7 +130,7 @@
 
   <div class="login-card">
     <div class="login-header">
-      <div class="login-logo">🎟️</div>
+      <div class="login-logo"><img src="/logo.png" alt="Logo" class="login-logo-img"></div>
       <h1 class="login-title">Referral Hub</h1>
       <p class="login-subtitle">Sign in to your account</p>
     </div>
@@ -140,17 +145,60 @@
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input type="password" id="password" class="form-input" placeholder="••••••••" required
-          autocomplete="current-password" />
+        <div style="position: relative;">
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required
+            autocomplete="current-password" style="padding-right: 40px;" />
+          <button type="button" id="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 5px; display: flex; align-items: center; justify-content: center;">
+            <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
+        <a href="#" id="forgot-pwd-link" style="font-size: 13px; color: var(--green); text-decoration: none; font-weight: 600;">Forgot Password?</a>
       </div>
       <button type="submit" id="submit-btn" class="btn-login">Sign In</button>
     </form>
+
+    <form id="forgot-form" style="display: none;">
+      <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Enter your email to receive a password reset link.</p>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="forgot-email" class="form-input" placeholder="name@example.com" required />
+      </div>
+      <button type="submit" id="btn-send-reset" class="btn-login">Send Reset Link</button>
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="#" id="back-to-login" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">&larr; Back to Login</a>
+      </div>
+    </form>
+
+    <form id="force-change-form" style="display: none;">
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #b45309;">
+        <strong>Security Notice:</strong> Your password was reset by an administrator. You must choose a new password before continuing.
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input type="password" id="force-new-password" class="form-input" placeholder="••••••••" required />
+      </div>
+      <button type="submit" id="btn-force-change" class="btn-login">Update Password & Continue</button>
+    </form>
+
+    <div style="text-align:center; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 12px; color: #4b5563; letter-spacing: 0.02em;">
+      <span>&copy; <span id="login-copyright-year"></span> SunBolon SA. All rights reserved.</span>
+      <br/>
+      <span style="opacity:0.6;">Referral Partner Portal &middot; Powered by SunBolon SA</span>
+    </div>
   </div>
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="/js/auth.js"></script>
   <script>
+    document.getElementById('login-copyright-year').textContent = new Date().getFullYear();
+
     // Configuration Injection (Temporary workaround for SPA without build step)
     // In a real production setup, these would be injected by Netlify Build
     // or fetched via a config endpoint.
@@ -160,8 +208,117 @@
     const form = document.getElementById('login-form');
     const errorMsg = document.getElementById('error-msg');
     const submitBtn = document.getElementById('submit-btn');
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
 
-    form.addEventListener('submit', async (e) => {
+    if (togglePassword) {
+      togglePassword.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+          eyeIcon.innerHTML = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          `;
+        } else {
+          eyeIcon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          `;
+        }
+      });
+    }
+
+    // Forms and views
+    const loginForm = document.getElementById('login-form');
+    const forgotForm = document.getElementById('forgot-form');
+    const forceChangeForm = document.getElementById('force-change-form');
+    
+    // Links
+    const forgotPwdLink = document.getElementById('forgot-pwd-link');
+    const backToLoginLink = document.getElementById('back-to-login');
+
+    // Toggles
+    forgotPwdLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'none';
+      forgotForm.style.display = 'block';
+      errorMsg.style.display = 'none';
+      errorMsg.className = '';
+      document.querySelector('.login-subtitle').textContent = 'Reset your password';
+    });
+
+    backToLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      forgotForm.style.display = 'none';
+      loginForm.style.display = 'block';
+      errorMsg.style.display = 'none';
+      errorMsg.className = '';
+      document.querySelector('.login-subtitle').textContent = 'Sign in to your account';
+    });
+
+    // Forgot password flow
+    forgotForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = 'none';
+      const btn = document.getElementById('btn-send-reset');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const email = document.getElementById('forgot-email').value;
+        await auth.resetPasswordForEmail(email);
+        errorMsg.textContent = 'Check your email for the reset link!';
+        errorMsg.style.display = 'block';
+        errorMsg.style.background = 'rgba(16, 185, 129, 0.1)';
+        errorMsg.style.color = '#059669';
+        errorMsg.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+        errorMsg.style.background = 'var(--red-glow)';
+        errorMsg.style.color = 'var(--red)';
+        errorMsg.style.borderColor = 'rgba(248, 113, 113, 0.2)';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Reset Link';
+      }
+    });
+
+    // Force change flow
+    forceChangeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = 'none';
+      const btn = document.getElementById('btn-force-change');
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+
+      try {
+        const newPassword = document.getElementById('force-new-password').value;
+        // In this flow we just logged in, so we have a session.
+        // changePassword requires currentPassword but under forced reset the user might only know the temp one.
+        // We can just call updateUser directly using supabaseClient.
+        const client = auth.initSupabase ? auth.initSupabase() : window.supabaseClient;
+        const _client = client || supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        
+        const { error } = await _client.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        
+        const { data: { user } } = await _client.auth.getUser();
+        await _client.from('profiles').update({ temp_password: null, force_password_change: false }).eq('id', user.id);
+        
+        window.location.href = '/';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Update Password & Continue';
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMsg.style.display = 'none';
       submitBtn.disabled = true;
@@ -171,8 +328,14 @@
       const password = document.getElementById('password').value;
 
       try {
-        await auth.login(email, password);
-        window.location.href = '/';
+        const result = await auth.login(email, password);
+        if (result && result.forceChange) {
+           loginForm.style.display = 'none';
+           forceChangeForm.style.display = 'block';
+           document.querySelector('.login-subtitle').textContent = 'Action Required';
+        } else {
+           window.location.href = '/';
+        }
       } catch (err) {
         errorMsg.textContent = err.message;
         errorMsg.style.display = 'block';

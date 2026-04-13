@@ -1,0 +1,25 @@
+
+> referral-notifier@1.0.0 start
+> node server.js
+
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+[2026-04-11 19:26:05.335] [[32MINFO[39M] [32m✅ Supabase clients initialized successfully.[39m
+[2026-04-11 19:26:06.762] [[32MINFO[39M] [32mLocal dev server started on port 3000[39m
+TypeError: fetch failed
+    at Object.fetch (node:internal/deps/undici/undici:11360:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async _handleRequest (/home/esmael/Coding_Project/ticket-teller/node_modules/@supabase/auth-js/dist/main/lib/fetch.js:101:18)
+    at async _request (/home/esmael/Coding_Project/ticket-teller/node_modules/@supabase/auth-js/dist/main/lib/fetch.js:91:18)
+    at async SupabaseAuthClient._getUser (/home/esmael/Coding_Project/ticket-teller/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js:2463:24)
+    at async SupabaseAuthClient.getUser (/home/esmael/Coding_Project/ticket-teller/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js:2449:20)
+    at async requireAuth (/home/esmael/Coding_Project/ticket-teller/routes/api.js:26:37) {
+  cause: ConnectTimeoutError: Connect Timeout Error
+      at onConnectTimeout (node:internal/deps/undici/undici:6616:28)
+      at node:internal/deps/undici/undici:6574:50
+      at Immediate._onImmediate (node:internal/deps/undici/undici:6605:13)
+      at process.processImmediate (node:internal/timers:476:21) {
+    code: 'UND_ERR_CONNECT_TIMEOUT'
+  }
+}
+[2026-04-11 19:48:01.006] [[32MINFO[39M] [32mPII exception toggled[39m {"adminId":"a48ad1e7-be75-4a9d-b22b-588a9c39301f","partnerId":"hr-maritime","enabled":true}
+[2026-04-11 19:48:13.149] [[32MINFO[39M] [32mPII access logged[39m {"accessorId":"5049f963-ed89-410e-8b8c-ef01b7e465d6","accessorRole":"partner","orderId":"BULK_QUERY","fields":["orderId"]}

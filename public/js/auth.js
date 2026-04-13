@@ -27,7 +27,19 @@ const auth = {
     console.log('[Auth] Attempting login for:', email);
     const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    return data;
+    
+      const profile = await this.getProfile();
+      if (profile && profile.status === 'inactive') {
+        await this.logout();
+        throw new Error('Your account is currently inactive. Please contact the administrator.');
+      }
+      
+      if (profile && profile.force_password_change) {
+        return { forceChange: true, ...data };
+      }
+      
+      return data;
+
   },
 
   async logout() {
@@ -78,14 +90,43 @@ const auth = {
     }
   },
 
-  async changePassword(newPassword) {
+  async changePassword(newPassword, currentPassword) {
     const client = initSupabase();
+    
+    // 1. Verify current password by attempting to sign in
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) throw new Error('No active user session');
+
+    const { error: verifyError } = await client.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword
+    });
+
+    if (verifyError) {
+      console.warn('[Auth] Current password verification failed:', verifyError.message);
+      throw new Error('Verification failed: Current password is incorrect.');
+    }
+
+    // 2. Proceed with update
     const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw error;
     
-    // Once password is changed, clear the temp_password field if it exists
-    const session = await this.getSession();
-    await client.from('profiles').update({ temp_password: null }).eq('id', session.user.id);
+    // 3. Clear temporary password if this was a first-time change
+    await client.from('profiles').update({ temp_password: null, force_password_change: false }).eq('id', user.id);
+  },
+
+  async resetPasswordForEmail(email) {
+    const client = initSupabase();
+    console.log('[Auth] Requesting password reset for:', email);
+    const { data, error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password.html'
+    });
+    if (error) throw error;
+    
+    // Log activity using our new endpoint if the user is already found? 
+    // Usually forgot password doesn't log on backend unless hooked there,
+    // but the email is sent natively by Supabase.
+    return data;
   }
 };
 

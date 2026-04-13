@@ -2,6 +2,9 @@
   publish = "public"
   functions = "functions"
 
+[build.environment]
+  NODE_VERSION = "20"
+
 # ─── Redirects ───
 
 # Redirect /api connections to the Netlify Function

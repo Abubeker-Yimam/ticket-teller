@@ -18,7 +18,7 @@ const totals = {
   totalCommission: 0,       // in smallest unit (pesewas/pence/cents)
   totalCancellations: 0,
   totalTickets: 0,
-  currency: 'GHS',
+  currency: 'CHF',
   lastUpdated: null,
 };
 

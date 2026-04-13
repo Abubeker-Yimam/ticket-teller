@@ -5,15 +5,26 @@
  * into a human-readable string.
  *
  * @param {number} amount   - Raw amount from Ticket Tailor (smallest unit)
- * @param {string} currency - ISO 4217 currency code e.g. "GHS", "USD", "GBP"
- * @returns {string}        - e.g. "GHS 75.00"
+ * @param {string} currency - ISO 4217 currency code e.g. "CHF", "USD", "GBP"
+ * @returns {string}        - e.g. "CHF 75.00"
  */
 function formatAmount(amount, currency = 'CHF') {
   if (typeof amount !== 'number' || isNaN(amount)) return `${currency} 0.00`;
-  return new Intl.NumberFormat('de-CH', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount / 100);
+  
+  // Normalize currency to string if it's an object from Ticket Tailor
+  const currencyCode = typeof currency === 'object' && currency.code 
+    ? currency.code.toUpperCase() 
+    : String(currency || 'CHF').toUpperCase();
+
+  try {
+    return new Intl.NumberFormat('de-CH', {
+      style: 'currency',
+      currency: currencyCode,
+    }).format(amount / 100);
+  } catch (err) {
+    // Fallback if invalid currency code still passed
+    return `${currencyCode} ${(amount / 100).toFixed(2)}`;
+  }
 }
 
 /**
@@ -24,7 +35,7 @@ function formatAmount(amount, currency = 'CHF') {
  * @param {string} currency
  * @returns {{ raw: number, formatted: string }}
  */
-function calculateCommission(orderTotal, commissionRate, currency = 'GHS') {
+function calculateCommission(orderTotal, commissionRate, currency = 'CHF') {
   if (!orderTotal || !commissionRate) return { raw: 0, formatted: formatAmount(0, currency) };
   const rawCommission = Math.round(orderTotal * commissionRate);
   return {

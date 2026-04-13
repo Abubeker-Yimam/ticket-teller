@@ -1,0 +1,1 @@
+const state = { hi: 1 };

@@ -6,8 +6,14 @@ const cors = require('cors');
 const { verifyWebhookSignature } = require('./middleware/verifyWebhook');
 const { handleOrderPlaced } = require('./handlers/orderPlaced');
 const { handleOrderCancelled } = require('./handlers/orderCancelled');
-const apiRouter = require('./routes/api');
+const { router: apiRouter } = require('./routes/api');
 const logger = require('./utils/logger');
+const activityLogger = require('./services/activityLogger');
+const emailService = require('./services/emailService');
+
+// Hooking to global object for easy access across the system (already referenced in api.js)
+global.activityLogger = activityLogger;
+global.emailService = emailService;
 
 const app = express();
 
@@ -27,8 +33,17 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'referral-notifier-serverless', ts: new Date().toISOString() });
 });
 
-// ─── Dashboard API ─────────────────────────────────────────────────────────────
+const chatRouter       = require('./routes/chat');
+const invitationRouter = require('./routes/invitations');
+const payoutsRouter    = require('./routes/payouts');
+// ─── Dashboard API ─────────────────────────────────────────────────
 app.use('/api', apiRouter);
+// ─── Chat API ──────────────────────────────────────────────────────
+app.use('/api/chat', chatRouter);
+// ─── Invitation API ────────────────────────────────────────────────
+app.use('/api/invitations', invitationRouter);
+// ─── Payouts API ───────────────────────────────────────────────────
+app.use('/api/payouts', payoutsRouter);
 
 // ─── Webhook Endpoint ──────────────────────────────────────────────────────────
 app.post(
@@ -50,10 +65,11 @@ app.post(
     logger.info('Webhook received', { event, orderId: data?.id });
 
     try {
-      if (event === 'order.created' || event === 'order.updated') {
+      const eventType = (event || '').toLowerCase();
+      if (eventType === 'order.created' || eventType === 'order.updated' || eventType === 'order.placed') {
         const { handleOrderEvent } = require('./handlers/orderPlaced');
-        await handleOrderEvent(event, data);
-      } else if (event === 'order.cancelled') {
+        await handleOrderEvent(eventType, data);
+      } else if (eventType === 'order.cancelled') {
         const { handleOrderCancelled } = require('./handlers/orderCancelled');
         await handleOrderCancelled(data);
       }
